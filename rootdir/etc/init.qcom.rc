@@ -1,4 +1,4 @@
-# Copyright (c) 2009-2012, 2014, The Linux Foundation. All rights reserved.
+# Copyright (c) 2009-2012, 2014-2015, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -30,7 +30,6 @@ import init.target.rc
 import init.qcom.usb.rc
 
 on early-init
-    mount debugfs debugfs /sys/kernel/debug
     write /sys/block/mmcblk0/queue/scheduler noop
 
 on init
@@ -60,6 +59,9 @@ on early-boot
     chown root audio /sys/kernel/boot_adsp/boot
 
 on boot
+    chown system system /sys/module/radio_iris_transport/parameters/fmsmd_set
+    chmod 0660 /sys/module/radio_iris_transport/parameters/fmsmd_set
+
     # Enable writing to led blink node from userspace
     chown system system /sys/class/leds/red/blink
     chown system system /sys/class/leds/green/blink
@@ -68,8 +70,6 @@ on boot
     chown system system /sys/class/leds/flashlight-front/brightness
     chown system camera /sys/class/leds/torch-light0/brightness
     chmod 0660 /sys/class/leds/torch-light0/brightness
-
-    mkdir /persist/bluetooth 0770 bluetooth bluetooth
 
     # Create QMUX deamon socket area
     mkdir /dev/socket/qmux_radio 0770 radio radio
@@ -80,9 +80,14 @@ on boot
     chmod 2770 /dev/socket/qmux_bluetooth
     mkdir /dev/socket/qmux_gps 0770 gps gps
     chmod 2770 /dev/socket/qmux_gps
-    
+    mkdir /persist/drm 0770 system system
+    mkdir /persist/misc 0770 system system
+
     # Create NETMGR daemon socket area
     mkdir /dev/socket/netmgr 0750 radio radio
+
+    # Remove SUID bit for iproute2 ip tool
+    chmod 0755 /system/bin/ip
 
     # Prevents permission denied error for telephony
     chmod 0644 /proc/cmdline
@@ -93,14 +98,6 @@ on boot
 
     # To allow interfaces to get v6 address when tethering is enabled
     write /proc/sys/net/ipv6/conf/rmnet0/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet1/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet2/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet3/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet4/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet5/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet6/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet7/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_usb0/accept_ra 2
 
     # To prevent out of order acknowledgements from making
     # connection tracking to treat them as not belonging to
@@ -126,19 +123,31 @@ on boot
     chown system system /proc/ctp_if_upgrade_old_version
 
 on post-fs-data
-
     mkdir /persist/data/sfs 0700 system system
     mkdir /persist/data/tz 0700 system system
+
+    # Create directory for TZ Apps
+    mkdir /data/misc/qsee 0770 system system
+
+    # we will remap this as /mnt/sdcard with the sdcard fuse tool
+    mkdir /data/misc/camera 0770 camera camera
+
+    mkdir /data/misc/ipa 0700 net_admin net_admin
+
+    mkdir /data/misc/bluetooth 0770 bluetooth bluetooth
+
+    # Create the directories used by the Wireless subsystem
+    mkdir /data/misc/wifi 0770 wifi wifi
+    mkdir /data/misc/wifi/sockets 0770 wifi wifi
+    mkdir /data/misc/wifi/wpa_supplicant 0770 wifi wifi
+    mkdir /data/misc/dhcp 0770 dhcp dhcp
+    chown dhcp dhcp /data/misc/dhcp
 
     # Create directory used by audio subsystem
     mkdir /data/misc/audio 0770 audio audio
 
     # Create directory used by the DASH client
     mkdir /data/misc/dash 0770 media audio
-
-    # Create directory used by display clients
-    mkdir /data/misc/display 0770 system graphics
-    mkdir /persist/display 0770 system graphics
 
     # Create directories for Location services
     mkdir /data/misc/location 0770 gps gps
@@ -149,7 +158,6 @@ on post-fs-data
     mkdir /data/misc/location/gsiff 0770 gps gps
 
     # Create directory for hostapd
-    mkdir /data/misc/wifi 0770 wifi wifi
     mkdir /data/hostapd 0770 system wifi
 
     # Create /data/time folder for time-services
@@ -158,9 +166,6 @@ on post-fs-data
     mkdir /data/audio/ 0770 media audio
 
     setprop vold.post_fs_data_done 1
-
-    # Create a folder for SRS to be able to create a usercfg file
-    mkdir /data/data/media 0770 media media
 
     # Create BST sensord file
     mkdir /data/misc/sensor 0755 system system
@@ -176,12 +181,15 @@ on post-fs-data
  
     # Create folder for mm-qcamera-daemon
     mkdir /data/camera 0770 media camera
-    mkdir /data/misc/camera 0770 camera camera
 
     # Create PERFD deamon related dirs
     mkdir /data/system/perfd 0770 root system
     chmod 2770 /data/system/perfd
     mkdir /persist/drm 0770 system system
+
+    # Create FM dir for patchdownloader
+    mkdir /data/misc/fm 0770 system system
+    chmod 0770 /data/misc/fm
 
     # Color calibration control
     chown system system /sys/devices/virtual/graphics/fb0/rgb
@@ -226,10 +234,6 @@ service config_bluetooth /system/bin/sh /system/etc/init.qcom.bt.sh "onboot"
     user root
     oneshot
 
-on property:vold.decrypt=trigger_restart_framework
-    start config_bt_addr
-    start config_bluetooth
-
 service hciattach /system/bin/sh /system/etc/init.qcom.bt.sh
     class late_start
     user bluetooth
@@ -247,7 +251,7 @@ on property:bluetooth.hciattach=false
 service qmuxd /system/bin/qmuxd
     class main
     user root
-    group radio audio bluetooth gps qcom_diag
+    group radio audio bluetooth gps nfc qcom_diag
 
 service netmgrd /system/bin/netmgrd
     class main
@@ -289,9 +293,6 @@ service wpa_supplicant /system/bin/wpa_supplicant \
     socket wpa_wlan0 dgram 660 wifi wifi
     disabled
     oneshot
-
-on property:init.svc.wpa_supplicant=stopped
-    stop dhcpcd
 
 service dhcpcd_wlan0 /system/bin/dhcpcd -ABKLG
     class late_start
@@ -367,7 +368,7 @@ service ril-daemon2 /system/bin/rild -c 2
     socket rild2 stream 660 root radio
     socket rild-debug2 stream 660 radio system
     user root
-    group radio cache inet misc audio sdcard_r sdcard_rw diag qcom_diag log
+    group radio cache inet misc audio sdcard_r sdcard_rw qcom_diag log
 
 service qcamerasvr /system/bin/mm-qcamera-daemon
     class late_start
@@ -380,23 +381,23 @@ service qseecomd /system/bin/qseecomd
     group root
 
 service perfd /system/vendor/bin/perfd
-    class main
-    user root
-    disabled
-    socket perfd seqpacket 0666 root system
+   class main
+   user root
+   disabled
+   socket perfd seqpacket 0666 root system
 
 service thermal-engine /system/vendor/bin/thermal-engine
-    class main
-    user root
-    socket thermal-send-client stream 0666 system system
-    socket thermal-recv-client stream 0660 system system
-    socket thermal-recv-passive-client stream 0666 system system
-    group root
+   class main
+   user root
+   socket thermal-send-client stream 0666 system system
+   socket thermal-recv-client stream 0660 system system
+   socket thermal-recv-passive-client stream 0666 system system
+   group root
 
 service time_daemon /system/bin/time_daemon
-    class late_start
-    user root
-    group root
+   class late_start
+   user root
+   group root
 
 service audiod /system/bin/audiod
    class late_start
