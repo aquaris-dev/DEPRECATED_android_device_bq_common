@@ -56,8 +56,7 @@ PRODUCT_PACKAGES += \
 
 # Charger
 PRODUCT_PACKAGES += \
-    charger_res_images \
-    libhealthd.msm8916
+    charger_res_images
 
 # Connectivity
 PRODUCT_PACKAGES += \
