@@ -62,7 +62,7 @@ FEATURE_QCRIL_UIM_SAP_SERVER_MODE := true
 BOARD_CHARGER_DISABLE_INIT_BLANK := true
 
 # CMHW
-BOARD_HARDWARE_CLASS := device/bq/common/cmhw/src
+BOARD_HARDWARE_CLASS := device/bq/msm8916-common/cmhw/src
 
 # Add suffix variable to uniquely identify the board
 TARGET_BOARD_SUFFIX := _32
@@ -101,7 +101,7 @@ MAX_EGL_CACHE_KEY_SIZE := 12*1024
 MAX_EGL_CACHE_SIZE := 2048*1024
 
 # Headers
-TARGET_SPECIFIC_HEADER_PATH := device/bq/common/include
+TARGET_SPECIFIC_HEADER_PATH := device/bq/msm8916-common/include
 
 # Init
 TARGET_PLATFORM_DEVICE_BASE := /devices/soc.0/
@@ -119,13 +119,13 @@ MALLOC_IMPL := dlmalloc
 TARGET_POWERHAL_VARIANT := qcom
 
 # Properties
-TARGET_SYSTEM_PROP := device/bq/common/system.prop
+TARGET_SYSTEM_PROP := device/bq/msm8916-common/system.prop
 
 # QCOM hardware
 BOARD_USES_QCOM_HARDWARE := true
 
 # Recovery
-TARGET_RECOVERY_FSTAB := device/bq/common/rootdir/etc/fstab.qcom
+TARGET_RECOVERY_FSTAB := device/bq/msm8916-common/rootdir/etc/fstab.qcom
 TARGET_RECOVERY_PIXEL_FORMAT := "BGRA_8888"
 TARGET_USERIMAGES_USE_EXT4 := true
 BOARD_SUPPRESS_EMMC_WIPE := true
@@ -136,7 +136,7 @@ TARGET_RIL_VARIANT := caf
 
 # SELinux
 include device/qcom/sepolicy/sepolicy.mk
-BOARD_SEPOLICY_DIRS += device/bq/common/sepolicy
+BOARD_SEPOLICY_DIRS += device/bq/msm8916-common/sepolicy
 
 # Time services
 BOARD_USES_QC_TIME_SERVICES := true
