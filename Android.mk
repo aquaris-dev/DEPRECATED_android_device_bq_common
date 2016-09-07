@@ -16,7 +16,7 @@
 
 LOCAL_PATH := $(call my-dir)
 
-ifneq ($(filter piccolo picmt,$(TARGET_DEVICE)),)
+ifneq ($(filter piccolo picmt vegetalte,$(TARGET_DEVICE)),)
 
 include $(call all-makefiles-under,$(LOCAL_PATH))
 
@@ -74,6 +74,8 @@ $(MBA_SYMLINK): $(LOCAL_INSTALLED_MODULE)
 
 ALL_DEFAULT_INSTALLED_MODULES += $(MBA_SYMLINK)
 
+ifneq ($(filter piccolo picmt,$(TARGET_DEVICE)),)
+
 # MODEM
 MODEM_IMAGES := \
     modem.b00 modem.b01 modem.b02 modem.b03 modem.b04 modem.b05 \
@@ -89,6 +91,8 @@ $(MODEM_SYMLINKS): $(LOCAL_INSTALLED_MODULE)
 	$(hide) ln -sf /firmware/$(notdir $@) $@
 
 ALL_DEFAULT_INSTALLED_MODULES += $(MODEM_SYMLINKS)
+
+endif
 
 # PLAYREADY
 PLAYREADY_IMAGES := \

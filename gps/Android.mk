@@ -16,6 +16,6 @@
 
 LOCAL_PATH := $(call my-dir)
 
-ifneq ($(filter piccolo picmt,$(TARGET_DEVICE)),)
+ifneq ($(filter piccolo picmt vegetalte,$(TARGET_DEVICE)),)
 include $(call all-subdir-makefiles,$(LOCAL_PATH))
 endif
