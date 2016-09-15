@@ -112,9 +112,6 @@ TARGET_KEYMASTER_WAIT_FOR_QSEE := true
 # Lights
 TARGET_PROVIDES_LIBLIGHT := true
 
-# Memory
-MALLOC_IMPL := dlmalloc
-
 # Power
 TARGET_POWERHAL_VARIANT := qcom
 
