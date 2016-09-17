@@ -30,7 +30,7 @@
 
 /dev/kgsl-3d0             0666   system     system
 /dev/ion                  0664   system     system
-/dev/rtc0                 0600   system     system
+/dev/rtc0                 0660   system     system
 /dev/smd0                 0660   system     system
 /dev/smd4                 0660   system     system
 /dev/smd5                 0660   system     system
