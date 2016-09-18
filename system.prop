@@ -94,6 +94,9 @@ ro.core_ctl_max_cpu=4
 # Set max background services
 ro.config.max_starting_bg=8
 
+# Storage
+ro.sdcardfs.enable=true
+
 # Telephony
 rild.libpath=/system/vendor/lib/libril-qc-qmi-1.so
 rild.libargs=-d /dev/smd0
