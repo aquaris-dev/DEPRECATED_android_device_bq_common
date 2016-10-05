@@ -19,6 +19,19 @@ use.voice.path.for.pcm.voip=true
 ro.fm.transmitter=false
 persist.sys.fm=qn8035
 
+# Bluetooth
+ro.bluetooth.hfp.ver=1.7
+ro.qualcomm.bt.hci_transport=smd
+ro.bluetooth.dun=true
+ro.bluetooth.sap=true
+ro.qualcomm.bluetooth.ftp=true
+ro.qualcomm.bluetooth.hfp=true
+ro.qualcomm.bluetooth.hsp=true
+ro.qualcomm.bluetooth.map=true
+ro.qualcomm.bluetooth.nap=true
+ro.qualcomm.bluetooth.opp=true
+ro.qualcomm.bluetooth.pbap=true
+
 # Camera
 morpho.hdr.enable=1
 morpho.hdr.nthreads=8
