@@ -20,6 +20,7 @@ ro.fm.transmitter=false
 persist.sys.fm=qn8035
 
 # Bluetooth
+qcom.bluetooth.soc=smd
 ro.bluetooth.hfp.ver=1.7
 ro.qualcomm.bt.hci_transport=smd
 ro.bluetooth.dun=true
