@@ -1,0 +1,3 @@
+# https://github.com/CyanogenMod/android_device_qcom_sepolicy/commit/0b70d2a
+# removed this. But in cm-14.0, mobile data doesn't work without this.
+allow netmgrd self:capability dac_override;
